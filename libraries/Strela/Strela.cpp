@@ -54,6 +54,7 @@ ISR(TIMER4_COMPD_vect)          // interrupt service routine for software PWM
 
 }
 
+
 namespace {
     
     uint8_t lcdPinMode = 0;
@@ -67,7 +68,6 @@ namespace {
     bool _motorConnection_2 = 0;
     
     bool strelaInit=false;
-    
   
     void _setMotorSpeed_1(int speed)
     {
@@ -179,7 +179,8 @@ namespace {
         Wire.endTransmission();
     }
 
-    uint8_t twiReadIn(uint8_t address, uint8_t pin)
+
+    uint8_t twiReadInAll(uint8_t address)
     {
     
         Wire.beginTransmission(address);
@@ -189,6 +190,14 @@ namespace {
         uint8_t n = Wire.requestFrom(address, (uint8_t)1);
         // TODO: is reading without wait is right?
         uint8_t state = Wire.read();
+    
+        return state;
+    }
+
+
+    uint8_t twiReadIn(uint8_t address, uint8_t pin)
+    {
+        uint8_t state = twiReadInAll(address);
     
         return (bool)(state & (1 << pin));
     }
@@ -297,7 +306,7 @@ void uDigitalWrite(uint8_t pin, uint8_t val)
     
     if ( pin > LAST_PIN)  //NOT ON PIN
     {
-        if ((pin > L1-1) && (pin < L4+1)) // it is LED?
+        if ((pin >= L1) && (pin <= L4)) // it is LED?
         {
             uint8_t ld = pin - L1;
             (val) ? ledState |= 1 << (7 - ld) : ledState &= ~(1 << (7 - ld));
@@ -334,7 +343,7 @@ uint8_t uDigitalRead(uint8_t pin)
     
     if ( pin > LAST_PIN)  //NOT ON PIN
     {
-        if ((pin > S1-1) && (pin < S4+1)) // it is Button?
+        if ((pin >= S1) && (pin <= S4)) // it is Button?
             return !twiReadIn(GPUX_TWI_ADDR, (3 - (pin - S1))); // !, pressed button return 0, need 1
             
         else return LOW;
@@ -369,10 +378,12 @@ void strelaInitialize()
 {
    // Configure I2C i/o chip
     twiPinMode(GPUX_TWI_ADDR, WIRE_IO_CONFIGURATION);
-    
+
     // Configure I2C LCD i/o chip to OUTPUT
     twiPinMode(LCD_TWI_ADDR, 0xff);
 
+    // Read I2C i/o chip to disable I2C interrupt pin
+    twiReadInAll(GPUX_TWI_ADDR);
     
     // Configure Pin
 
@@ -385,7 +396,7 @@ void strelaInitialize()
     TCCR4A |= (1<<COM4B1); //enable communicate pin 10 and OCR4
     TCCR4D &= ~(1<<WGM41) & ~(1<<WGM40); 
     TC4H =0;
-    
+
     strelaInit = true;
     
 } 
@@ -464,5 +475,9 @@ void stepperMotor(int stepsToMove, int stepDelay)
         _stepMotor(stepNumber %= 8);
     }
   }
+}
+
+uint8_t getButtonsState()
+{
 
 }

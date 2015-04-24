@@ -110,5 +110,7 @@ void motorConnection(
 
 void stepperMotor(int stepsToMove, int stepDelay);
 
+uint8_t getButtonsState();
+
 
 #endif
