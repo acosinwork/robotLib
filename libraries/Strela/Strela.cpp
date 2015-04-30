@@ -33,6 +33,8 @@
 #define MOTOR_ENABLE_34_PIN      9
 #define MOTOR_DIRECTION_34_PIN   4
 
+#define I2C_BUTTON_CHANGE_PIN    7
+
 #define LAST_PIN LS7
 
 //Перевод из Qx в LCx
@@ -391,6 +393,8 @@ void strelaInitialize()
     DDRD |= _BV(4);           //pinMode(4, OUTPUT);
     DDRB |= _BV(5) | _BV(6);  //pinMode(9,10, OUTPUT);
     
+    DDRE &= ~_BV(6);        //pinMode(7, INPUT); //button change checker;
+    
     
     // Configure software PWM4D Timer to fast PWM
     TCCR4A |= (1<<COM4B1); //enable communicate pin 10 and OCR4
@@ -477,7 +481,78 @@ void stepperMotor(int stepsToMove, int stepDelay)
   }
 }
 
-uint8_t getButtonsState()
+/*
+uint8_t checkButtons()
 {
 
+    static unsigned long time = millis();
+    static uint8_t lastResult = 0;
+
+    unsigned long timeDiff = millis() - time; 
+
+    if (!digitalRead(7) && (timeDiff > 50)) {
+
+        time = millis();
+
+        uint8_t buttons = ~ twiReadInAll(GPUX_TWI_ADDR);
+
+        for (uint8_t i = 0; i < 4; ++i) {
+
+            bool debounce = (timeDiff > 200) || (i+S1!=lastResult);
+
+            if ((buttons & ( 1 << (3 - i) )) && debounce) {
+                tone(BUZZER, 1200, 50);
+                return lastResult = i+S1;
+            }
+        }
+    }
+
+    return 0;
 }
+*/
+
+
+uint8_t checkButtons()
+{
+
+    static unsigned long time = millis();
+    static uint8_t lastResult = 0;
+    static bool wasClick = false;
+
+    uint8_t result = 0;
+
+    unsigned long timeDiff = millis() - time; 
+
+    if ((timeDiff > 100)) 
+        
+    {
+
+        time = millis();
+
+        uint8_t buttons = ~ twiReadInAll(GPUX_TWI_ADDR);
+
+        if ((lastResult == buttons) && !wasClick)
+        {
+
+            for (uint8_t i = 0; i < 4; ++i) 
+            {
+
+                if ((buttons & ( 1 << (3 - i) )) ) 
+                {
+                    tone(BUZZER, 1200, 50);
+                    result = i+S1;
+                    wasClick = true;
+                }
+            }
+        } 
+        else 
+        {
+            lastResult = buttons;
+            wasClick = false;
+        }
+
+    }
+
+    return result;
+}
+

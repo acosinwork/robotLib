@@ -110,7 +110,7 @@ void motorConnection(
 
 void stepperMotor(int stepsToMove, int stepDelay);
 
-uint8_t getButtonsState();
+uint8_t checkButtons();
 
 
 #endif
