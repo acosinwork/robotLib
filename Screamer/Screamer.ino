@@ -1,27 +1,28 @@
+// Кричалка
+#define LED_PIN 10
+#define MICROPHONE_PIN A5
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(6, OUTPUT);
+  //Светодиод
+  pinMode(LED_PIN, OUTPUT);
   Serial.begin(9600);
-
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
   unsigned int val = 0;
 
   for (int i = 0; i < 4; ++i)
   {
-    val += analogRead(A0);
+    val += analogRead(MICROPHONE_PIN);
   }
   val >>= 2;
 
   if (val > 700)
   {
-    analogWrite(6, map(analogRead(A0), 0, 1023, 0, 255));
+    analogWrite(LED_PIN, map(analogRead(MICROPHONE_PIN), 0, 1023, 0, 255));
   }
   else
-    analogWrite(6, 0);
-  Serial.println(analogRead(A0));
+    analogWrite(LED_PIN, 0);
+  Serial.println(analogRead(MICROPHONE_PIN));
 }
