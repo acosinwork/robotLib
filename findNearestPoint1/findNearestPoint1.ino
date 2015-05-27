@@ -10,6 +10,14 @@
 #define DEG_STEP             5
 #define LOOKUP_START_DEG     -90
 #define LOOKUP_END_DEG       90
+#define HALF_LOOKUP_SECTOR   20
+
+
+enum State{
+  findTheWall,
+  
+}
+
 
 /*
 #define LOOKUP_MEASURE_COUNT (LOOKUP_END_DEG - LOOKUP_START_DEG) / DEG_STEP
@@ -18,10 +26,8 @@
 #define DIST   1
 */
 
-struct POINT {
-  int distance;
-  int degree;
-} nearestPoint;
+int nearestPointAngle, nearestPointDistance;
+int oldDist = 0;
 
 int power = 50;
 
@@ -29,7 +35,7 @@ int power = 50;
 
 double Setpoint, Input, Output;
 
-double Kp = 0.5, Ki = 0.0, Kd = 0.0;
+double Kp = 0.1, Ki = 0.0, Kd = 0.0;
 
 //Specify the links and initial tuning parameters
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
@@ -44,6 +50,7 @@ int echo = P12;
 Ultrasonic ultrasonic(trig, echo);
 
 void setup() {
+  Serial.begin(9600);
   // put your setup code here, to run once:
   bot.begin();
 
@@ -51,12 +58,12 @@ void setup() {
 
   lookThis(LOOKUP_START_DEG);
 
-  int constantDist = 3000;
+  int nearestPointDistance = 20000; // максимум короче
 
-  while (constantDist != getDistanceCentimeter())
+  while (nearestPointDistance != getDistanceCentimeter())
   {
     delay(100);
-    constantDist = getDistanceCentimeter();
+    nearestPointDistance = getDistanceCentimeter();
   }
 
   myPID.SetSampleTime(100);
@@ -64,46 +71,29 @@ void setup() {
 
   myPID.SetMode(AUTOMATIC);
 
-  nearestPointDeg = findNearestPoint();
+
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if (nearestPointDeg > 0)
-    Input = nearestPointDeg = findNearestPoint(0, nearestPointDeg + 10, 2);
-  else if (nearestPointDeg < 0)
-    Input = nearestPointDeg = findNearestPoint(nearestPointDeg - 10, 0, 2);
-  else
-    Input = nearestPointDeg = findNearestPoint(nearestPointDeg - 5, nearestPointDeg + 5, 2);
 
+  bool state = findTheWall(15);
 
+  while (state)
+    ;;
 
-
-  if (myPID.Compute())
-  {
-    int uSpeed = Output;
-    int brake = (abs(uSpeed) >> 1);
-
-    bot.speed(power + uSpeed - brake, power - uSpeed - brake);
-  }
-
-  delay(300);
-
-  bot.speed(0, 0);
-
-
-
-  /*  while (!uDigitalRead(S1))
-      ;;
-  */
+}
+void findNearestPoint()
+{
+  findNearestPoint(LOOKUP_START_DEG, LOOKUP_END_DEG, DEG_STEP);
 }
 
-int findNearestPoint(POINT* needToFind,int startAngle, int endAngle, int stepAngle)
+void findNearestPoint(int startAngle, int endAngle, int stepAngle)
 {
   static bool rise = true;
 
-  enum measureData {degree, distance};
+  enum measureData {angle, distance};
 
   int measureCount = (endAngle - startAngle) / stepAngle;
 
@@ -113,12 +103,14 @@ int findNearestPoint(POINT* needToFind,int startAngle, int endAngle, int stepAng
   {
     if (rise)
     {
-      measures[i][degree] = startAngle + i * stepAngle;
+      measures[i][angle] = startAngle + i * stepAngle;
     } else {
-      measures[i][degree] = endAngle - i * stepAngle;
+      measures[i][angle] = endAngle - i * stepAngle;
     }
 
-    lookThis(measures[i][degree]);
+    lookThis(measures[i][angle]);
+    if (measures[i][angle] == startAngle)
+      delay(abs(measures[i][angle] - nearestPointAngle));
 
     measures[i][distance] = getDistanceCentimeter();
 
@@ -138,24 +130,43 @@ int findNearestPoint(POINT* needToFind,int startAngle, int endAngle, int stepAng
     }
   }
 
-  //  lookThis(measures[lowerDistField][degree]);
+  int i = 0;
+  while ((measures[lowerDistField + i][distance] == nearestPoint) && (lowerDistField + i < measureCount))
+    ++i;
 
-  return measures[lowerDistField][degree];
+  lowerDistField += i / 2;
+
+
+
+
+  oldDist = nearestPointDistance;
+  nearestPointAngle = measures[lowerDistField][angle];
+  nearestPointDistance = measures[lowerDistField][distance];
+
 
 }
 
 int getDistanceCentimeter()
 {
 
-  static float FK = 0.1;
+  static float FK = 0.25;
   static int dist = 0;
 
-  for (int i = 0; i < 2; ++i)
+  for (int i = 0; i < 3; ++i)
   {
-    delay(30);
-    dist = (1 - FK) * dist + FK * ultrasonic.CalcDistance(ultrasonic.timing(), Ultrasonic::CM);
+    delay(22);
+
+    int currentDist;
+    if (!(currentDist = ultrasonic.CalcDistance(ultrasonic.timing(), Ultrasonic::CM)))
+      currentDist = ultrasonic.CalcDistance(8000, Ultrasonic::CM);
+
+    dist = (1 - FK) * dist + FK * currentDist;
+
+    //    dist = (1 - FK) * dist + FK * ultrasonic.CalcDistance(ultrasonic.timing(), Ultrasonic::CM);
   }
-  tone(BUZZER, 6000 - (dist * 50), 50);
+  tone(BUZZER, 6000 - (dist * 20), 2);
+
+  //  Serial.println(dist);
 
   return dist; //ultrasonic.CalcDistance(trustedMicrosecond, Ultrasonic::CM); //this result unit is centimeter
 }
@@ -163,5 +174,56 @@ int getDistanceCentimeter()
 void lookThis(int grad)
 {
   myservo.write(grad + 90);
+}
+
+bool findTheWall(int minDistance)
+{
+  if (nearestPointDistance > 1.2 * oldDist)
+  {
+    bot.speed(0, 0);
+
+    findNearestPoint();
+
+
+
+  }  else  {
+
+    int lookupSectorStart = nearestPointAngle - HALF_LOOKUP_SECTOR;
+    int lookupSectorEnd = nearestPointAngle + HALF_LOOKUP_SECTOR;
+
+    if (lookupSectorStart < LOOKUP_START_DEG)
+    {
+      lookupSectorEnd += LOOKUP_START_DEG - lookupSectorStart;
+      lookupSectorStart = LOOKUP_START_DEG;
+    } else if (lookupSectorEnd > LOOKUP_END_DEG)
+    {
+      lookupSectorStart -= lookupSectorEnd - LOOKUP_END_DEG;
+      lookupSectorEnd = LOOKUP_END_DEG;
+    }
+
+    findNearestPoint(lookupSectorStart, lookupSectorEnd, DEG_STEP);
+  }
+
+  if (nearestPointDistance <= minDistance)
+  {
+    bot.speed(0, 0);
+    return true; 
+  }
+  else
+  {
+
+    Input = nearestPointAngle;
+
+    if (myPID.Compute())
+    {
+      int uSpeed = Output;
+      int brake = (abs(uSpeed) * 0.8);
+
+      bot.speed(power + uSpeed - brake, power - uSpeed - brake);
+
+    }
+    return false;
+  }
+
 }
 
