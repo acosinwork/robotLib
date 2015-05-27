@@ -25,7 +25,7 @@ long Ultrasonic::timing()
 	digitalWrite(_trigPin,HIGH);
 	delayMicroseconds(10);
 	digitalWrite(_trigPin,LOW);
-	return pulseIn(_EchoPin,HIGH);
+	return pulseIn(_EchoPin,HIGH, 8000); 
 }
 
 float Ultrasonic::CalcDistance(long microsec,int metric)

@@ -18,19 +18,19 @@ unsigned long timeServo = 0;
 unsigned long timeUltra = 0;
 
 
-int needDistance = 40;
+int needDistance = 60;
 
-int alpha = 10;
-int degStep = 10;
+int alpha = 0;
+int degStep = 1;
 
 bool rise = true;
 
-int power = 50;
+int power = 40;
 
 const double multiplier = 3.0 / 1024;
 double Setpoint, Input, Output;
 
-double Kp = 1.14, Ki = 0.4, Kd = 0.08;
+double Kp = 0.9, Ki = 0.2, Kd = 0.0;
 
 //Specify the links and initial tuning parameters
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
@@ -76,55 +76,72 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  if (millis()-timeUltra > 10)
+
+  if (millis() - timeUltra > 30)
   {
-  Input =  getDistanceCentimeter() * cos(alpha*PI/180) - needDistance;
-  timeUltra=millis();
+    int distance = getDistanceCentimeter();
+
+    if (rise)
+      Input =  distance - needDistance;
+
+    else if (distance < 2 * needDistance)
+      Input =  distance - 2 * needDistance;
+
+    //    if (alpha <= 40)
+    //      Input =  distance  - needDistance;
+    /*
+        else if ((distance  - needDistance) < 0)
+        {
+          if (180 - alpha <= 40)
+            Input = needDistance - distance;
+          else
+            Input =  distance  - needDistance;
+        }
+
+
+        else
+          bot.speed(20, 20);
+          */
+
+    timeUltra = millis();
+
   }
 
-  if (millis()-timeServo > 100)
+  if (millis() - timeServo > 500)
   {
     if (rise)
     {
-      alpha += degStep;
-      if (alpha >= 60)
-        rise = false;
+      //  alpha += degStep;
+      //  if (alpha >= 20)
+      alpha = 90;
+      rise = false;
     }
     else
     {
-      alpha -= degStep;
-      if (alpha <= 0)
-        rise = true;
+      //    alpha -= degStep;
+      //    if (alpha <= 0)
+      alpha = 0;
+      rise = true;
     }
 
     myservo.write(alpha);
     timeServo = millis();
   }
 
-
   if (myPID.Compute())
   {
-    //    lcd.home();
-    //    lcd.print(millis() - timetimetime);
-    //    timetimetime = millis();
-
     int uSpeed = Output;
     int brake = (abs(uSpeed) >> 1);
 
     bot.speed(power - uSpeed - brake, power + uSpeed - brake);
   }
+
   checkClick();
 
 }
 
-int getDistanceRaw()
-{
-  return bot.sensors.read(0);//(bot.sensors.readPct(0) - bot.sensors.readPct(1));
-}
-
 bool checkClick()
 {
-
 
   static bool lastClick = false;
   static unsigned long time = 0;
@@ -200,39 +217,25 @@ void printAll()
 
 double setK()
 {
-  return (double)analogRead(P9) * multiplier;
+  static float FK = 0.2;
+  static int pot = 0;
+  pot = (1 - FK) * pot + FK * analogRead(P9);
+  return (double)pot * multiplier;
 }
-/*
+
 int getDistanceCentimeter()
 {
-  int adcValue = getDistanceRaw();
-  if (adcValue > 600)                             // lower boundary: 4 cm (3 cm means under the boundary)
-  {
-    return (3);
-  }
 
-  if (adcValue < 80 )                             //upper boundary: 36 cm (returning 37 means over the boundary)
-  {
-    return (37);
-  }
+  static float FK = 0.5;
+  static int dist = 0;
 
-  else
-  {
-    return (1 / (0.0002391473 * adcValue - 0.0100251467));
-  }
-}
-*/
-double getDistanceCentimeter()
-{
-  static long lastMicros = 0;
-  long microsec = ultrasonic.timing();
-  
-  if (microsec>8000)
-   microsec = lastMicros;
-   else
-   lastMicros = microsec;
+  int distRaw = ultrasonic.CalcDistance(ultrasonic.timing(), Ultrasonic::CM);
 
-  return ultrasonic.CalcDistance(microsec, Ultrasonic::CM); //this result unit is centimeter
+  dist = (1 - FK) * dist + FK * distRaw;
+
+  tone(BUZZER, 3000 - (dist * 50), 50);
+
+  return dist; //ultrasonic.CalcDistance(trustedMicrosecond, Ultrasonic::CM); //this result unit is centimeter
 }
 
 

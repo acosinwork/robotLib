@@ -27,7 +27,7 @@ void draw()
   text(s, 10, 30);
   
   for (int i=0; i<oscill.size()-2; ++i) {
-    line(i, (sizeRect-(oscill.get(i))*5), i+1, (sizeRect-(oscill.get(i+1))*5));
+    line(i, (sizeRect-(oscill.get(i)*5)), i+1, (sizeRect-(oscill.get(i+1))*5));
   }
 }
   
