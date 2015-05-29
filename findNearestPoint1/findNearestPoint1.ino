@@ -10,26 +10,22 @@
 #define DEG_STEP             5
 #define LOOKUP_START_DEG     -90
 #define LOOKUP_END_DEG       90
-#define HALF_LOOKUP_SECTOR   20
+#define HALF_LOOKUP_SECTOR   15//20
 
 
-enum State{
-  findTheWall,
-  
-}
+enum State {
+  FIND_THE_WALL,
+  GET_WALL_POSITION,
+  FOLLOW_THE_WALL
+} state;
 
-
-/*
-#define LOOKUP_MEASURE_COUNT (LOOKUP_END_DEG - LOOKUP_START_DEG) / DEG_STEP
-
-#define DEG    0
-#define DIST   1
-*/
 
 int nearestPointAngle, nearestPointDistance;
 int oldDist = 0;
 
-int power = 50;
+int power = 80;//50;
+
+int needDistance = 40;
 
 //int nearestPointDeg;
 
@@ -56,6 +52,8 @@ void setup() {
 
   myservo.attach(P3);  // attaches the servo on pin 9 to the servo object
 
+  state = FIND_THE_WALL;
+
   lookThis(LOOKUP_START_DEG);
 
   int nearestPointDistance = 20000; // максимум короче
@@ -66,7 +64,7 @@ void setup() {
     nearestPointDistance = getDistanceCentimeter();
   }
 
-  myPID.SetSampleTime(100);
+  myPID.SetSampleTime(30);
   myPID.SetOutputLimits(-power, power);
 
   myPID.SetMode(AUTOMATIC);
@@ -78,10 +76,44 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  bool state = findTheWall(15);
+  switch (state)
+  {
+    case FIND_THE_WALL:
 
-  while (state)
-    ;;
+      uDigitalWrite(L1, HIGH);
+      uDigitalWrite(L2, LOW);
+      uDigitalWrite(L3, LOW);
+
+
+      if (findTheWall(needDistance * 1.2))
+        state = GET_WALL_POSITION;
+      break;
+
+    case GET_WALL_POSITION:
+
+
+      uDigitalWrite(L1, LOW);
+      uDigitalWrite(L2, HIGH);
+      uDigitalWrite(L3, LOW);
+
+      if (getWallPosition())
+        state = FOLLOW_THE_WALL;
+      myPID.SetTunings(0.9, 0.2, 0.01);
+      break;
+
+    case FOLLOW_THE_WALL:
+
+
+      uDigitalWrite(L1, LOW);
+      uDigitalWrite(L2, LOW);
+      uDigitalWrite(L3, HIGH);
+
+      if (!followTheWall())
+        state = FIND_THE_WALL;
+      myPID.SetTunings(0.1, 0.0, 0.0);
+      break;
+  }
+
 
 }
 void findNearestPoint()
@@ -110,7 +142,7 @@ void findNearestPoint(int startAngle, int endAngle, int stepAngle)
 
     lookThis(measures[i][angle]);
     if (measures[i][angle] == startAngle)
-      delay(abs(measures[i][angle] - nearestPointAngle));
+      delay(abs(measures[i][angle] - nearestPointAngle) * 2);
 
     measures[i][distance] = getDistanceCentimeter();
 
@@ -136,9 +168,6 @@ void findNearestPoint(int startAngle, int endAngle, int stepAngle)
 
   lowerDistField += i / 2;
 
-
-
-
   oldDist = nearestPointDistance;
   nearestPointAngle = measures[lowerDistField][angle];
   nearestPointDistance = measures[lowerDistField][distance];
@@ -154,7 +183,7 @@ int getDistanceCentimeter()
 
   for (int i = 0; i < 3; ++i)
   {
-    delay(22);
+    delay(25);
 
     int currentDist;
     if (!(currentDist = ultrasonic.CalcDistance(ultrasonic.timing(), Ultrasonic::CM)))
@@ -176,15 +205,14 @@ void lookThis(int grad)
   myservo.write(grad + 90);
 }
 
-bool findTheWall(int minDistance)
+
+void lookup()
 {
   if (nearestPointDistance > 1.2 * oldDist)
   {
     bot.speed(0, 0);
 
     findNearestPoint();
-
-
 
   }  else  {
 
@@ -203,27 +231,82 @@ bool findTheWall(int minDistance)
 
     findNearestPoint(lookupSectorStart, lookupSectorEnd, DEG_STEP);
   }
+}
+
+
+bool findTheWall(int minDistance)
+{
+  lookup();
 
   if (nearestPointDistance <= minDistance)
   {
     bot.speed(0, 0);
-    return true; 
+    return true;
+  }
+
+  Input = nearestPointAngle;
+
+  if (myPID.Compute())
+  {
+    int uSpeed = Output;
+    int brake = (abs(uSpeed) * 0.8);
+
+    bot.speed(power + uSpeed - brake, power - uSpeed - brake);
+
+  }
+  return false;
+}
+
+bool getWallPosition()
+{
+  if ((nearestPointAngle - HALF_LOOKUP_SECTOR) > LOOKUP_START_DEG)
+  {
+    bot.speed(-power, power);
+    delay(200);
+    bot.speed(0, 0);
+    lookup();
+    return false;
+  }
+  else
+    return true;
+}
+
+bool followTheWall()
+{
+
+  lookup();
+
+  //  if (nearestPointDistance > 2 * needDistance)
+  //    return false;
+
+  if ((nearestPointAngle < HALF_LOOKUP_SECTOR) && (nearestPointAngle > -HALF_LOOKUP_SECTOR) && (nearestPointDistance < needDistance))
+  {
+    bot.speed(-power, -power);
+
+    delay(200);
+    return false;
   }
   else
   {
 
-    Input = nearestPointAngle;
+    if (nearestPointAngle < 0 - HALF_LOOKUP_SECTOR)
+      Input = nearestPointDistance - needDistance - needDistance * cos(nearestPointAngle * PI / 180);
+
+    else if (nearestPointAngle > 0 + HALF_LOOKUP_SECTOR)
+
+      Input = nearestPointDistance + needDistance + needDistance * cos(nearestPointAngle * PI / 180);
 
     if (myPID.Compute())
     {
       int uSpeed = Output;
-      int brake = (abs(uSpeed) * 0.8);
+      int brake = (abs(uSpeed) >> 1);
 
-      bot.speed(power + uSpeed - brake, power - uSpeed - brake);
-
+      bot.speed(power - uSpeed - brake, power + uSpeed - brake);
     }
-    return false;
+
   }
+  return true;
 
 }
+
 
