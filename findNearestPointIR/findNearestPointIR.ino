@@ -7,6 +7,7 @@
 #include <Ultrasonic.h>
 #include <Servo.h>
 
+
 #define DEG_STEP             10
 #define LOOKUP_START_DEG     -90
 #define LOOKUP_END_DEG       90
@@ -19,13 +20,20 @@ enum State {
   FOLLOW_THE_WALL
 } state;
 
+/// DELETEIT
+#include <DistanceGP2Y0A21YK.h>
+
+DistanceGP2Y0A21YK Dist;
+/////
+
+
 
 int nearestPointAngle, nearestPointDistance;
 int oldDist = 0;
 
 int power = 40;
 
-int needDistance = 40;
+int needDistance = 30;
 
 //int nearestPointDeg;
 
@@ -46,6 +54,10 @@ int echo = P12;
 Ultrasonic ultrasonic(trig, echo);
 
 void setup() {
+  ///DELETEIT
+  Dist.begin(P5);
+  
+  
   Serial.begin(9600);
   // put your setup code here, to run once:
   bot.begin();
@@ -174,7 +186,7 @@ void findNearestPoint(int startAngle, int endAngle, int stepAngle)
 
 
 }
-
+/*
 int getDistanceCentimeter()
 {
 
@@ -190,6 +202,32 @@ int getDistanceCentimeter()
       currentDist = ultrasonic.CalcDistance(8000, Ultrasonic::CM);
 
     dist = (1 - FK) * dist + FK * currentDist;
+
+    //    dist = (1 - FK) * dist + FK * ultrasonic.CalcDistance(ultrasonic.timing(), Ultrasonic::CM);
+  }
+  tone(BUZZER, 6000 - (dist * 20), 2);
+
+  //  Serial.println(dist);
+
+  return dist; //ultrasonic.CalcDistance(trustedMicrosecond, Ultrasonic::CM); //this result unit is centimeter
+}
+*/
+
+int getDistanceCentimeter()
+{
+
+  static float FK = 0.25;
+  static int dist = 0;
+
+  for (int i = 0; i < 3; ++i)
+  {
+    delay(25);
+/*
+    int currentDist;
+    if (!(currentDist = ultrasonic.CalcDistance(ultrasonic.timing(), Ultrasonic::CM)))
+      currentDist = ultrasonic.CalcDistance(8000, Ultrasonic::CM);
+*/
+    dist = (1 - FK) * dist + FK * Dist.getDistanceCentimeter();;
 
     //    dist = (1 - FK) * dist + FK * ultrasonic.CalcDistance(ultrasonic.timing(), Ultrasonic::CM);
   }
@@ -279,7 +317,7 @@ bool followTheWall()
   //  if (nearestPointDistance > 2 * needDistance)
   //    return false;
 
-  if ((nearestPointAngle < HALF_LOOKUP_SECTOR) && (nearestPointAngle > -HALF_LOOKUP_SECTOR) && (nearestPointDistance < needDistance))
+  if ((nearestPointAngle < HALF_LOOKUP_SECTOR) && (nearestPointAngle > - HALF_LOOKUP_SECTOR) && (nearestPointDistance < needDistance))
   {
     bot.speed(-power, -power);
 
@@ -289,10 +327,10 @@ bool followTheWall()
   else
   {
 
-    if (nearestPointAngle < 0 - HALF_LOOKUP_SECTOR)
+    if (nearestPointAngle <= 0 - HALF_LOOKUP_SECTOR)
       Input = nearestPointDistance - needDistance - needDistance * cos(nearestPointAngle * PI / 180);
 
-    else if (nearestPointAngle > 0 + HALF_LOOKUP_SECTOR)
+    else if (nearestPointAngle >= 0 + HALF_LOOKUP_SECTOR)
 
       Input = nearestPointDistance + needDistance + needDistance * cos(nearestPointAngle * PI / 180);
 

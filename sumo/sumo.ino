@@ -23,7 +23,7 @@ enum State {
 int nearestPointAngle, nearestPointDistance;
 int oldDist = 0;
 
-int power = 40;
+int power = 50;
 
 int needDistance = 40;
 
@@ -49,6 +49,8 @@ void setup() {
   Serial.begin(9600);
   // put your setup code here, to run once:
   bot.begin();
+  bot.sensors.attach(P7);
+  bot.sensors.attach(P8);
 
   myservo.attach(P3);  // attaches the servo on pin 9 to the servo object
 
@@ -68,6 +70,25 @@ void setup() {
   myPID.SetOutputLimits(-power, power);
 
   myPID.SetMode(AUTOMATIC);
+
+
+
+
+
+  while (!uDigitalRead(S2))
+  {
+    for (int i = 0; i < bot.sensors.count(); ++i)
+      bot.sensors.setBlack(i);
+  }
+
+  tone(BUZZER, 400, 100);
+
+  while (!uDigitalRead(S4))
+  {
+    for (int i = 0; i < bot.sensors.count(); ++i)
+      bot.sensors.setWhite(i);
+  }
+  tone(BUZZER, 500, 100);
 
 
 
@@ -238,11 +259,22 @@ bool findTheWall(int minDistance)
 {
   lookup();
 
-  if (nearestPointDistance <= minDistance)
+  /*
+    if (nearestPointDistance <= minDistance)
+    {
+      bot.speed(0, 0);
+      return true;
+    }
+  */
+
+  for (int i = 0; i < bot.sensors.count(); ++i)
   {
-    bot.speed(0, 0);
-    return true;
+    Serial.println(bot.sensors.readPct(i));
+    while (bot.sensors.readPct(i) > 50)
+      bot.speed(-power, -power);
+      
   }
+
 
   Input = nearestPointAngle;
 
