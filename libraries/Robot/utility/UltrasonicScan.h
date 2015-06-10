@@ -36,7 +36,7 @@ public:
 
 private:
 	float _kFilt = 0.25;
-	float _oldDistance;
+	float _oldDistance = 0;
 	bool _firstMeasure = true;
 	TimeOut _betweenMeasurements;
 };
@@ -65,8 +65,8 @@ private:
 	Servo servo;
 	UltrasonicFiltered* ultrasonic;
 
-    int sectorStart;
-    int sectorEnd;
+    int _sectorStart;
+    int _sectorEnd;
 
 	enum ServoState {
 		wait,

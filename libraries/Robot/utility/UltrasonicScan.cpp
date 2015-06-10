@@ -43,7 +43,10 @@ void UltrasonicFiltered::setKF(float k_filter)
 
 float UltrasonicFiltered::getRawDistance()
 {
-	return CalcDistance(timing(), CM);
+	if (long timingIsCorrect = timing())
+		return CalcDistance(timingIsCorrect, CM);
+	else
+		return _oldDistance;
 }
 
 float UltrasonicFiltered::getDistance()
@@ -65,8 +68,8 @@ float UltrasonicFiltered::getDistance()
 
     UltrasonicScaner::UltrasonicScaner()
     {
-    	sectorStart = MIN_ANGLE;
-    	sectorEnd = MAX_ANGLE;
+    	_sectorStart = MIN_ANGLE;
+    	_sectorEnd = MAX_ANGLE;
     }
 
 	void UltrasonicScaner::attachUltrasonic(int trigPin, int echoPin)
@@ -101,17 +104,32 @@ float UltrasonicFiltered::getDistance()
 	{
 		if (fromAngle < toAngle)
 		{
-			sectorStart = fromAngle;
-			sectorEnd = toAngle;
+			_sectorStart = fromAngle;
+			_sectorEnd = toAngle;
 		}
 		else
 		{
-			sectorStart = toAngle;
-			sectorEnd = fromAngle;
+			_sectorStart = toAngle;
+			_sectorEnd = fromAngle;
 		}
+
+		int rightArcAngle = abs(_currentAngle - _sectorStart);
+		int leftArcAngle = abs(_currentAngle - _sectorEnd);
+
+		if (rightArcAngle < leftArcAngle)
+			_servoState = clockwise;
+		else
+			_servoState = counterclockwise;
+		
+		/*
+		if (_currentAngle <= _sectorStart)
+			_servoState = counterclockwise;
+		else if (_currentAngle >= _sectorEnd)
+			_servoState = clockwise;
 
 //deleteit
 		_servoState = clockwise;
+		*/
 
 	}
 
@@ -131,7 +149,7 @@ bool UltrasonicScaner::findNearestPointAngle()
 
 			case clockwise:
 			{
-				if (_currentAngle > sectorStart)
+				if (_currentAngle > _sectorStart)
 					lookAt(_currentAngle - 1);
 				else
 					_servoState = counterclockwise;
@@ -140,7 +158,7 @@ bool UltrasonicScaner::findNearestPointAngle()
 
 			case counterclockwise:
 			{
-				if (_currentAngle < sectorEnd)
+				if (_currentAngle < _sectorEnd)
 					lookAt(_currentAngle + 1);
 				else
 					_servoState = clockwise;
@@ -149,6 +167,5 @@ bool UltrasonicScaner::findNearestPointAngle()
 
 		}
 	}
-
 	return result;
 }
