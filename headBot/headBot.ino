@@ -2,7 +2,7 @@
 #include <Wire.h>
 #include <Strela.h>
 #include <SumoBot.h>
-#include <Amp_ino.h>
+//#include <Amp_ino.h>
 #include <Servo.h>
 //#include <UltrasonicScan.h>
 
