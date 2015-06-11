@@ -1,10 +1,11 @@
 #include <EEPROM.h>
 #include <Wire.h>
 #include <Strela.h>
+#include <Amp_ino.h>
 #include <LineBot.h>
 #include <LiquidCrystal_I2C.h>
 #include <PID_v1.h>
-#include <Ultrasonic.h>
+//#include <Ultrasonic.h>
 #include <Servo.h>
 
 
