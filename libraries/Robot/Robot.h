@@ -30,7 +30,7 @@ class Robot {
 
     private:
 
-    	int _motorMaxSpeed[2];
+    	int _motorMaxSpeed[2] = {0, 0};
 
     	float motorsDiffMultiplier;
 

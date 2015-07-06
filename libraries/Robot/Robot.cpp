@@ -21,8 +21,6 @@ void Robot::begin()
 {
 	strelaInitialize();
 
-	tone(BUZZER,1000,50);
-
 	MotorCalibration(_motorMaxSpeed);
 
 	if (_motorMaxSpeed[1] != 0) 
