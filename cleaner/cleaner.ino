@@ -55,8 +55,7 @@ void setup() {
   
   //bot.head.ultrasonic.setSilenceTime(15);
 
-  bot.head.setLookUpSector(-15, 15
-  );
+  bot.head.setLookUpSector(-15, 15);
 
   bot.head.lookAt(0);
   minDistance = 1000;//bot.head.getDistance();

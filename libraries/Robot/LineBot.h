@@ -8,14 +8,10 @@
 
 
 class LineBot : public Robot
-{
-	public:
-		LineBot();
-
-		LineSensor sensors;
-
-		void begin();
-
+ public:
+  LineBot();
+  LineSensor sensors;
+  void begin();
 };
 
-#endif
+#endif // LINEBOT_H

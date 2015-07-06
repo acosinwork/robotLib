@@ -399,7 +399,7 @@ void strelaInitialize()
     // Configure software PWM4D Timer to fast PWM
     TCCR4A |= (1<<COM4B1); //enable communicate pin 10 and OCR4
     TCCR4D &= ~(1<<WGM41) & ~(1<<WGM40); 
-    TC4H =0;
+    TC4H = 0;
 
     strelaInit = true;
     
