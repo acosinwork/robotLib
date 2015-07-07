@@ -2,6 +2,8 @@
 #include <Wire.h>
 #include <Strela.h>
 #include <LineBot.h>
+#include <Servo.h>
+
 
 #include <LiquidCrystal_I2C.h>
 

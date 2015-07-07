@@ -7,7 +7,7 @@
 #include "utility/LineSensor.h"
 
 
-class LineBot : public Robot
+class LineBot : public Robot {
  public:
   LineBot();
   LineSensor sensors;
