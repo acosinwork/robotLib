@@ -567,7 +567,7 @@ uint8_t buttonsState()
         uint8_t checkPosition = 1 << (3 - i);
         if (buttons & checkPosition)
         {
-            result = 1 << i;
+            result |= 1 << i;
         }
     }
     return result;

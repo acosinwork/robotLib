@@ -4,10 +4,13 @@
 #include <inttypes.h>
 #include "Robot.h"
 
-#include <utility/LineSensor.h>
+#include "utility/LineSensor.h"
 //#include <utility/Ultrasonic/Ultrasonic.h>
 
-#include <utility/UltrasonicScan.h>
+#include "utility/UltrasonicScan.h"
+
+#include "utility/Buttons.h"
+
 
 
 class SumoBot : public Robot
@@ -20,6 +23,10 @@ class SumoBot : public Robot
 		LineSensor sensors;
 
 		UltrasonicScaner head;
+
+		Buttons buttons;
+
+
 
 //		UltrasonicFiltered head;
 

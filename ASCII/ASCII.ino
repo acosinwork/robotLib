@@ -1,4 +1,10 @@
 
+#include <Wire.h>
+#include <Strela.h>
+
+//#define SERIAL_TX_BUFFER_SIZE 512
+
+#include "ascii-art.h"
 String s[] = {
   "  _    _      _ _         __     __       _           _ ",
   " | |  | |    | | |        \\ \\   / /      | |         | |",
@@ -12,6 +18,8 @@ String s[] = {
   "     \\/  \\/ \\___|                                       "
 };
 
+VideoBuffer video;
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -20,10 +28,27 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  for (int i = 0; i < 10; ++i)
-  {
-    Serial.println(s[i]);
-    delay(80);
+  if (uDigitalRead(S2))
+    video.movePos( -1);
+  
+  
+  if (uDigitalRead(S4))
+    video.movePos( 1);
+  for (int i=0; i< DEF_COLUMNS; ++i)
+  {  
+    video.buf[i][DEF_ROWS-1] = video.blank;
   }
+  video.buf[video.pos][DEF_ROWS-1] = video.gamer;
+    
 
+
+  for (int row = 0; row < DEF_ROWS; ++row)
+  {
+    for (int col = 0; col < DEF_COLUMNS; ++col)
+    {
+      Serial.print(video.buf[col][row]);
+    }
+    Serial.println();
+  }
+  delay(120);
 }
