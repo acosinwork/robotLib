@@ -3,6 +3,9 @@
 
 #include <inttypes.h>
 #include <Strela.h>
+#include "utility/Melodies.h"
+
+
 
 class Robot {
 
@@ -27,6 +30,8 @@ class Robot {
 //	protected:
 
 		void begin();
+		void done();
+		void stop();
 
     private:
 

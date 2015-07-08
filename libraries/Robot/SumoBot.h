@@ -9,6 +9,7 @@
 
 #include <utility/UltrasonicScan.h>
 
+#include <utility/PinManager.h>
 
 class SumoBot : public Robot
 {
@@ -21,7 +22,12 @@ class SumoBot : public Robot
 
 		UltrasonicScaner head;
 
-//		UltrasonicFiltered head;
+		Melody voice;
+
+		PinManager pin;
+
+
+		
 
 };
 

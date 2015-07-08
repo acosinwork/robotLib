@@ -10,7 +10,6 @@
 
 Robot::Robot()
 {
-
  
 	/*TODO*/
 
@@ -26,6 +25,19 @@ void Robot::begin()
 	if (_motorMaxSpeed[1] != 0) 
 		motorsDiffMultiplier = (float)_motorMaxSpeed[0] / _motorMaxSpeed[1];
 
+}
+
+void Robot::done()
+{
+	stop();
+	
+	while (true)
+		;;
+}
+
+void Robot::stop()
+{
+	speed(0);
 }
 
 void Robot::writeMotorsSpeed(int motorLeft, int motorRight)
@@ -46,6 +58,9 @@ void Robot::speed(int spd)
 {
 	speed(spd, spd);
 }
+
+
+
 /*
 
 void acceleration(uint8_t accel)
