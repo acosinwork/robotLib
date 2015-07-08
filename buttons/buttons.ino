@@ -2,7 +2,10 @@
 #include <Wire.h>
 #include <Strela.h>
 #include <LineBot.h>
+<<<<<<< HEAD
 #include <Amp_ino.h>
+=======
+>>>>>>> bd53fb4c19a7a0e38171eab9ead896de3cef48ee
 #include <Servo.h>
 
 

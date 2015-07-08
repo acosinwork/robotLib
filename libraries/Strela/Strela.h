@@ -110,7 +110,8 @@ void motorConnection(
 
 void stepperMotor(int stepsToMove, int stepDelay);
 
+// maybe we don't need it
 uint8_t checkButtons();
-
+uint8_t buttonsState();
 
 #endif
