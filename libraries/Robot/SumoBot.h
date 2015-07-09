@@ -4,10 +4,13 @@
 #include <inttypes.h>
 #include "Robot.h"
 
-#include <utility/LineSensor.h>
+#include "utility/LineSensor.h"
 //#include <utility/Ultrasonic/Ultrasonic.h>
 
-#include <utility/UltrasonicScan.h>
+#include "utility/UltrasonicScan.h"
+
+#include "utility/Buttons.h"
+
 
 #include <utility/PinManager.h>
 
@@ -26,8 +29,7 @@ class SumoBot : public Robot
 
 		PinManager pin;
 
-
-		
+		Buttons buttons;
 
 };
 
