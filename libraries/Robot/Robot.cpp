@@ -59,6 +59,10 @@ void Robot::speed(int spd)
 	speed(spd, spd);
 }
 
+void Robot::beep(int freq, int toneLength)
+{
+	tone(BUZZER, freq, toneLength);
+}
 
 
 /*

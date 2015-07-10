@@ -9,10 +9,11 @@ SumoBot::SumoBot() : Robot()
 {
 }
 
-
+/*
 void SumoBot::begin()
 {
 	Robot::begin();
 
 }
+*/
 

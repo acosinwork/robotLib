@@ -33,6 +33,10 @@ class Robot {
 		void done();
 		void stop();
 
+		void beep(int freq = 1000, int toneLength = 50);
+
+		
+
     private:
 
     	int _motorMaxSpeed[2] = {0, 0};

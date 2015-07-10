@@ -19,7 +19,7 @@ class SumoBot : public Robot
 	public:
 		SumoBot();
 
-		void begin();
+//		void begin();
 
 		LineSensor sensors;
 

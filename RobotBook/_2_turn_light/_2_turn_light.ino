@@ -2,12 +2,14 @@
 #include <Wire.h>
 #include <Strela.h>
 #include <SumoBot.h>
-#include <Amp_ino.h>
+//#include <Amp_ino.h>
 #include <Servo.h>
 
 SumoBot bot;
 
 void setup() {
+  bot.begin();
+  
   bot.pin.turnOn(L1);
 }
 

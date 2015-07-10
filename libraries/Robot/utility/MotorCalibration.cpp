@@ -153,6 +153,8 @@ void MotorCalibration(int (&maxSpeed)[2])
 		_writeCalibratedValue(currentMotorSpeed);
 	}
 
+	drive(0,0);
+
 	maxSpeed[0] = currentMotorSpeed[0];
 	maxSpeed[1] = currentMotorSpeed[1];
 }

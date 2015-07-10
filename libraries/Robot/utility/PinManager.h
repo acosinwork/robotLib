@@ -20,6 +20,12 @@ public:
 		uDigitalWrite(pin, LOW);
 	}
 
+	void toggle(uint8_t pin)
+	{
+		uPinMode(pin, OUTPUT);
+		uDigitalWrite(pin, !uDigitalRead(pin));
+	}
+
 	void beep(int freq, int length)
 	{
 		tone(BUZZER, freq, length);
