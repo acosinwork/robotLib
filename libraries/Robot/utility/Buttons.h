@@ -9,22 +9,16 @@ class Buttons{
 public:
 
   uint8_t check();
-  
-  void onPress(uint8_t button, void (*callback)());
-
-  void onRelease(uint8_t button, void (*callback)());
-
   uint8_t getState();
 
-  void (*pressCallbackS1)();
-  void (*pressCallbackS2)();
-  void (*pressCallbackS3)();
-  void (*pressCallbackS4)();
+  uint8_t getPressedButton();
+  uint8_t getReleasedButton();
+  
+  void onPress(void (*callback)());
+  void onRelease(void (*callback)());
 
-  void (*releaseCallbackS1)();
-  void (*releaseCallbackS2)();
-  void (*releaseCallbackS3)();
-  void (*releaseCallbackS4)();
+  void (*pressCallback)();
+  void (*releaseCallback)();
 
 private:
 
@@ -36,8 +30,12 @@ private:
   uint8_t _newPress;
   uint8_t _newRelease;
 
-  uint8_t _pressCalbackAttached = 0;
-  uint8_t _releaseCalbackAttached = 0;
+  bool _pressCalbackAttached = false;
+  bool _releaseCalbackAttached = false;
+
+  uint8_t _pressedButton;
+  uint8_t _releasedButton;
+  
 
 
 };

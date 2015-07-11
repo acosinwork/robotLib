@@ -25,10 +25,7 @@ void setup() {
 
   bot.pin.turnOn(L1);
 
-  bot.buttons.onPress(S1, goForward);
-  bot.buttons.onPress(S2, goBack);
-  bot.buttons.onPress(S3, goLeft);
-  bot.buttons.onPress(S4, goRight);
+  bot.buttons.onPress(fillRoad);
 
   while (currentStep < STEP_COUNT)
   {
@@ -74,31 +71,27 @@ void loop ()
   }
 }
 
-void goForward()
+void fillRoad()
 {
   bot.beep();
-  steps[currentStep] = FORWARD;
+
+  int pressedButton = bot.buttons.getPressedButton();
+
+  switch (pressedButton)
+  {
+    case S1:
+      steps[currentStep] = FORWARD;
+      break;
+    case S2:
+      steps[currentStep] = BACK;
+      break;
+    case S3:
+      steps[currentStep] = LEFT;
+      break;
+    case S4:
+      steps[currentStep] = RIGHT;
+      break;
+  }
+  
   ++currentStep;
 }
-void goBack()
-{
-  bot.beep();
-  steps[currentStep] = BACK;
-  ++currentStep;
-}
-void goLeft()
-{
-  bot.beep();
-  steps[currentStep] = LEFT;
-  ++currentStep;
-}
-void goRight()
-{
-  bot.beep();
-  steps[currentStep] = RIGHT;
-  ++currentStep;
-}
-
-
-
-
