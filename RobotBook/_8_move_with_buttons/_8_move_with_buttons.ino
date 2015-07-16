@@ -42,33 +42,34 @@ void setup() {
 
 void loop ()
 {
-  --currentStep;
-
-  switch (steps[currentStep])
+  while (currentStep)
   {
-    case FORWARD:
-      bot.speed(100, 100);
-      break;
-    case BACK:
-      bot.speed(-100, -100);
-      break;
-    case LEFT:
-      bot.speed(-100, 100);
-      break;
-    case RIGHT:
-      bot.speed(100, -100);
+    --currentStep;
+
+    switch (steps[currentStep])
+    {
+      case FORWARD:
+        bot.speed(100, 100);
+        break;
+      case BACK:
+        bot.speed(-100, -100);
+        break;
+      case LEFT:
+        bot.speed(-100, 100);
+        break;
+      case RIGHT:
+        bot.speed(100, -100);
+    }
+
+    delay(MOVE_TIME);
   }
 
-  delay(MOVE_TIME);
+  bot.stop();
+  delay(1000);
 
-  if (!currentStep)
-  {
-    bot.stop();
-    delay(1000);
+  bot.voice.play();
+  bot.done();
 
-    bot.voice.play();
-    bot.done();
-  }
 }
 
 void fillRoad()
@@ -92,6 +93,6 @@ void fillRoad()
       steps[currentStep] = RIGHT;
       break;
   }
-  
+
   ++currentStep;
 }

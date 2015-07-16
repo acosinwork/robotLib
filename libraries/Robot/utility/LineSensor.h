@@ -31,7 +31,7 @@ class LineSensor
 class LineSensor
 	{
 	public:
-//		LineSensor();
+		LineSensor();
 
 		uint8_t attach(uint8_t pin);
 

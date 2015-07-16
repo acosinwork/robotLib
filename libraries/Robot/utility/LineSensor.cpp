@@ -3,6 +3,15 @@
 
 #define AVERAGE_COUNT_FOR_SHIFT_DIV 4 
 
+
+LineSensor::LineSensor()
+{
+	for (uint8_t i=0; i< MAX_SENSORS_COUNT; ++i) {
+		_sensors[i]._whiteVal = 0;
+		_sensors[i]._blackVal = 1023;
+	}
+}
+
 uint8_t LineSensor::attach(uint8_t pin)
 {
 

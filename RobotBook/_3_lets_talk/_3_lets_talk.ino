@@ -15,6 +15,6 @@ void setup() {
 
 void loop ()
 {
-  bot.voice.play();
   delay(1000);
+  bot.voice.play();
 }

@@ -34,13 +34,13 @@ uint8_t Buttons::check()
 
       if (_pressCalbackAttached && (_newPress & mask)) {
         _pressedButton = i + S1;
-        pressCallback;
+        pressCallback();
       }
 
       if (_releaseCalbackAttached && (_newRelease & mask)) {
 
         _releasedButton = i + S1;
-        releaseCallback;
+        releaseCallback();
       }
     }
   }
