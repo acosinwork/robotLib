@@ -115,6 +115,7 @@ int getDistanceCentimeter()
   tone(BUZZER, 6000 - (dist * 20), 2);
 
   //  Serial.println(dist);
+  
 
   return dist; //ultrasonic.CalcDistance(trustedMicrosecond, Ultrasonic::CM); //this result unit is centimeter
 }

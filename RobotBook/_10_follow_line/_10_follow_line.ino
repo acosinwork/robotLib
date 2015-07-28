@@ -6,7 +6,7 @@
 
 #include <PID_v1.h>
 
-int power = 150;//90;
+int power = 90;
 
 double Setpoint, Input, Output;
 
