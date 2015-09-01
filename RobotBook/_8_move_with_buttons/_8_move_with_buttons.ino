@@ -1,17 +1,22 @@
+/*
 #include <EEPROM.h>
 #include <Wire.h>
 #include <Strela.h>
+*/
+
 #include <SumoBot.h>  // maybe
+
+/*
 //#include <Amp_ino.h>
 #include <Servo.h>
-
-#define MOVE_TIME 500
+*/
+#define MOVE_TIME  500
 #define STEP_COUNT 8
 
-#define FORWARD 0
-#define BACK    1
-#define LEFT    2
-#define RIGHT   3
+#define FORWARD    0
+#define BACK       1
+#define LEFT       2
+#define RIGHT      3
 
 SumoBot bot;
 
@@ -93,6 +98,5 @@ void fillRoad()
       steps[currentStep] = RIGHT;
       break;
   }
-
   ++currentStep;
 }

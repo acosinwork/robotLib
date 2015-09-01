@@ -2,7 +2,7 @@
 #define ROBOT_H
 
 #include <inttypes.h>
-#include <Strela.h>
+#include "utility/Strela.h"
 #include "utility/Melodies.h"
 
 

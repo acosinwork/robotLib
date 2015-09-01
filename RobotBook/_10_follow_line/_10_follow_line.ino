@@ -1,10 +1,14 @@
+/*
 #include <EEPROM.h>
 #include <Wire.h>
 #include <Strela.h>
-#include <SumoBot.h>
 #include <Servo.h>
 
 #include <PID_v1.h>
+*/
+
+#include <SumoBot.h>
+
 
 int power = 90;
 
@@ -24,7 +28,7 @@ void setup() {
   bot.sensors.attach(P6);
   bot.sensors.attach(P7);
 
-  while (!uDigitalRead(S2))
+  while (bot.pin.isLow(S2))
   {
     for (int i = 0; i < bot.sensors.count(); ++i)
       bot.sensors.setBlack(i);
@@ -32,7 +36,7 @@ void setup() {
 
   bot.beep(400);
 
-  while (!uDigitalRead(S4))
+  while (bot.pin.isLow(S4))
   {
     for (int i = 0; i < bot.sensors.count(); ++i)
       bot.sensors.setWhite(i);
@@ -43,7 +47,7 @@ void setup() {
   Setpoint = 0;
 
   delay(1000);
-  
+
   //turn the PID on
   myPID.SetSampleTime(30);
   myPID.SetOutputLimits(-power, power);
@@ -59,7 +63,7 @@ void loop() {
   if (myPID.Compute())
   {
     int uSpeed = Output;
-    int brake = (abs(uSpeed)>>1);
+    int brake = (abs(uSpeed) / 2);
 
     bot.speed(power - uSpeed - brake, power + uSpeed - brake);
   }
@@ -70,5 +74,7 @@ int getLine()
 {
   return (bot.sensors.readPct(0) - bot.sensors.readPct(1));
 }
+
+
 
 

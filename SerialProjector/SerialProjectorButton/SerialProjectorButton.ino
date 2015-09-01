@@ -11,7 +11,7 @@ Serial.print("<button id=\"but\" onclick=\"myFunction()\">Click me</button>");
 
 Serial.print("<script>");
 Serial.print("function myFunction() {");
-Serial.print("alert(\"hello\");");
+Serial.print("document.body.style.background = 'red';");
 Serial.print("}");
 Serial.print("</script>");
 

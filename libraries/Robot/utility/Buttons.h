@@ -1,5 +1,5 @@
-#include <Wire.h>
-#include <Strela.h>
+#include "Wire.h"
+#include "Strela.h"
 #include <inttypes.h>
 #include "Amp_ino.h"
 
@@ -10,6 +10,8 @@ public:
 
   uint8_t check();
   uint8_t getState();
+
+  uint8_t waitForPress();
 
   uint8_t getPressedButton();
   uint8_t getReleasedButton();

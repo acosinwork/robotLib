@@ -1,7 +1,7 @@
 #include <inttypes.h>
 #include <Arduino.h>
-#include <Wire.h>
-#include <Strela.h>
+#include "Wire.h"
+#include "Strela.h"
 
 
 class PinManager

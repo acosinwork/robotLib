@@ -1,9 +1,9 @@
-#include <EEPROM.h>
-#include <Wire.h>
-#include <Strela.h>
+//#include <EEPROM.h>
+//#include <Wire.h>
+//#include <Strela.h>
 #include <SumoBot.h>
-#include <Amp_ino.h>
-#include <Servo.h>
+//#include <Amp_ino.h>
+//#include <Servo.h>
 
 enum State {
   findGarbage,

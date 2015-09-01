@@ -74,3 +74,8 @@ uint8_t Buttons::getReleasedButton()
 {
   return _releasedButton;
 }
+
+uint8_t Buttons::waitForPress()
+{
+  
+}

@@ -1,9 +1,4 @@
-#include <EEPROM.h>
-#include <Wire.h>
-#include <Strela.h>
 #include <SumoBot.h>  // maybe
-//#include <Amp_ino.h>
-#include <Servo.h>
 
 SumoBot bot;
 

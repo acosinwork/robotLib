@@ -1,12 +1,4 @@
-#include <EEPROM.h>
-#include <Wire.h>
-#include <Strela.h>
-#include <Amp_ino.h>
-#include <LineBot.h>
-#include <LiquidCrystal_I2C.h>
-#include <PID_v1.h>
-#include <Ultrasonic.h>
-#include <Servo.h>
+#include <SumoBot.h>
 
 
 #define STEP_COUNT           6
@@ -14,22 +6,23 @@
 #define LOOKUP_END_DEG       60
 #define DEG_STEP             (LOOKUP_END_DEG-LOOKUP_START_DEG)/STEP_COUNT
 
-int power = 40;
+int power = 80;
 int error = 0;
 int needDistance = 40;
 
 bool rise = false;
 
-LineBot bot;
+SumoBot bot;
 
 Servo myservo;  // create servo object to control a servo
 
 int trig = P11;
 int echo = P12;
-Ultrasonic ultrasonic(trig, echo);
+Ultrasonic ultrasonic;
 
 void setup() {
 
+ultrasonic.attach(trig, echo);
 
   Serial.begin(9600);
   // put your setup code here, to run once:

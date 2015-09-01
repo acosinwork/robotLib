@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 #include "Amp_ino.h"
-#include <Servo.h>
+#include "Servo.h"
 
 #include <stddef.h>
 #if defined(ARDUINO) && ARDUINO >= 100

@@ -1,10 +1,4 @@
-#include <EEPROM.h>
-#include <Wire.h>
-#include <Strela.h>
 #include <SumoBot.h>
-#include <Amp_ino.h>
-#include <Servo.h>
-//#include <UltrasonicScan.h>
 
 
 SumoBot bot;
@@ -18,8 +12,8 @@ void setup() {
   
   bot.begin();
 
-  bot.head.attachUltrasonic(P11, P12);
-  bot.head.attachServo(P3);
+  bot.head.ultrasonic.attach(P11, P12);
+  bot.head.servo.attach(P3);
 
   bot.head.setLookUpSector(-80, 80);
 
